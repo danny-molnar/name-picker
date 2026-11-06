@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A little wheel for your daily. Pick a name, give everyone a turn. Names stay in your browser.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Name Picker · Who’s next?</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header><a class="brand" href="./"><span class="brand-icon" aria-hidden="true">✳</span> Name Picker</a><span class="local-badge"><span aria-hidden="true">●</span> Just in your browser</span></header>
+    <main>
+      <div class="intro"><p class="eyebrow">A LITTLE SPIN FOR YOUR DAILY</p><h1>Who’s next<span>?</span></h1><p>One less decision. Everyone gets a turn.</p></div>
+      <div class="workspace">
+        <section class="picker" aria-label="Name wheel">
+          <div class="wheel-wrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="1000" height="1000" aria-label="Wheel showing the people available to pick"></canvas><div class="wheel-center" aria-hidden="true">✳</div></div>
+          <div class="result" role="status" aria-live="polite"><p id="result-label">THE FLOOR IS YOURS,</p><h2 id="result">Add your people</h2></div>
+          <button class="pick-button" id="pick" disabled>Pick someone <span aria-hidden="true">↗</span></button>
+          <p class="remaining" id="remaining">Add at least one name to get rolling.</p>
+        </section>
+        <aside class="panel" aria-label="People and settings">
+          <div class="panel-heading"><h2>Your people</h2><span class="count" id="count">0 people</span></div>
+          <label class="field-label" for="names">One name per line. Everyone’s welcome.</label>
+          <textarea id="names" rows="6" placeholder="Alex&#10;Jamie&#10;Morgan&#10;…" spellcheck="false" maxlength="12000"></textarea>
+          <div class="list-actions"><button class="text-button" id="example">Try example names</button><button class="text-button muted" id="clear">Clear</button></div>
+          <p id="input-note" class="input-note" role="status"></p>
+          <div id="people" class="people" aria-label="Attendance"></div>
+          <div class="settings">
+            <label class="setting"><span><strong>Everyone gets a turn</strong><small>Skip names already picked this round</small></span><input id="no-repeat" type="checkbox" checked><span class="toggle" aria-hidden="true"></span></label>
+            <label class="setting"><span><strong>Remember my list</strong><small>Save names and attendance on this device</small></span><input id="remember" type="checkbox"><span class="toggle" aria-hidden="true"></span></label>
+            <p id="storage-note" class="input-note" role="status"></p>
+          </div>
+          <div class="round-heading"><h3>This round</h3><button class="text-button" id="reset">Start fresh ↺</button></div>
+          <ol id="history" class="history" aria-label="Names picked this round"></ol><p id="empty-history" class="empty-history">A clean slate. Let the wheel decide.</p>
+        </aside>
+      </div>
+    </main>
+    <div id="winner-popup" class="winner-popup" hidden aria-hidden="true">
+      <div class="winner-card">
+        <span class="winner-spark" aria-hidden="true">✳</span>
+        <p>The floor is yours,</p>
+        <div id="winner-name" class="winner-name"></div>
+        <span class="winner-caption">Your turn to shine.</span>
+      </div>
+    </div>
+    <footer><span>A fair turn, a little fun.</span><span>No accounts. No tracking. Names stay here.</span></footer>
+  </div>
+</body>
+</html>
