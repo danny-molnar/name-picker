@@ -4,7 +4,7 @@
   const canvas = $('wheel');
   const ctx = canvas.getContext('2d');
   const STORAGE_KEY = 'name-picker:v1';
-  const colors = ['#dce5b9', '#abc6ad', '#f1d59a', '#d6c6dc', '#efbca6', '#b6d5d0', '#e7e4cd', '#b8c49d'];
+  const colors = ['#1d3a7a', '#0e5a6b', '#2a1f5c', '#0b6a62', '#243b8f', '#17496e', '#35308a', '#0a4f55'];
   let names = [], absent = new Set(), history = [], rotation = 0, busy = false;
   let animation;
   const available = () => names.filter(name => !absent.has(name) && (!$('no-repeat').checked || !history.includes(name)));
@@ -34,16 +34,16 @@
     for (let i = 0; i < total; i++) {
       const start = -Math.PI / 2 + step * i;
       ctx.beginPath(); ctx.moveTo(500, 500); ctx.arc(500, 500, 500, start, start + step); ctx.closePath();
-      ctx.fillStyle = entries.length ? colors[i % colors.length] : '#e7ebdf'; ctx.fill();
-      ctx.strokeStyle = '#ffffff88'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.fillStyle = entries.length ? colors[i % colors.length] : '#16224a'; ctx.fill();
+      ctx.strokeStyle = '#080f24'; ctx.lineWidth = 4; ctx.stroke();
       if (entries.length) {
         ctx.save(); ctx.translate(500, 500); ctx.rotate(start + step / 2);
-        ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#283e32';
-        ctx.font = `600 ${total > 30 ? 22 : total > 16 ? 32 : 48}px system-ui, sans-serif`;
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffffff';
+        ctx.font = `700 ${total > 30 ? 30 : total > 16 ? 42 : total > 8 ? 56 : 66}px system-ui, sans-serif`;
         let label = entries[i];
-        while (ctx.measureText(label).width > 300 && label.length > 1) label = label.slice(0, -1);
+        while (ctx.measureText(label).width > 340 && label.length > 1) label = label.slice(0, -1);
         if (label !== entries[i]) label = label.slice(0, -1) + '…';
-        ctx.fillText(label, 435, 0); ctx.restore();
+        ctx.fillText(label, 465, 0); ctx.restore();
       }
     }
   }
