@@ -84,6 +84,52 @@
     return value[0] % length;
   }
 
+  // Silent celebration: a short confetti burst on a full-screen canvas.
+  const confettiCanvas = $('confetti');
+  const confettiCtx = confettiCanvas.getContext('2d');
+  const confettiColors = ['#00d9a6', '#00f0b8', '#ffffff', '#4f7cff', '#35308a', '#ffd166', '#17496e'];
+  let confettiFrame;
+
+  function stopConfetti() {
+    cancelAnimationFrame(confettiFrame);
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  }
+
+  function launchConfetti() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = window.innerWidth, h = window.innerHeight;
+    confettiCanvas.width = w * dpr; confettiCanvas.height = h * dpr;
+    confettiCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const rand = (min, max) => min + Math.random() * (max - min);
+    const burst = (x, y, count, spread) => Array.from({ length: count }, () => {
+      const angle = -Math.PI / 2 + rand(-spread, spread);
+      const speed = rand(9, 22);
+      return { x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, size: rand(6, 12), rot: rand(0, 6.28), vr: rand(-.3, .3), color: confettiColors[Math.floor(rand(0, confettiColors.length))], round: Math.random() < .3, wobble: rand(0, 6.28) };
+    });
+    const pieces = [...burst(w / 2, h * .55, 110, 1.1), ...burst(w * .15, h * .9, 40, .5), ...burst(w * .85, h * .9, 40, .5)];
+    const start = performance.now(), life = 3000;
+    const tick = now => {
+      const t = now - start;
+      confettiCtx.clearRect(0, 0, w, h);
+      for (const p of pieces) {
+        p.vy += .35; p.vx *= .985; p.vy *= .985; p.x += p.vx + Math.sin(p.wobble += .08) * .8; p.y += p.vy; p.rot += p.vr;
+        confettiCtx.save(); confettiCtx.globalAlpha = Math.max(0, Math.min(1, (life - t) / 700));
+        confettiCtx.translate(p.x, p.y); confettiCtx.rotate(p.rot); confettiCtx.fillStyle = p.color;
+        if (p.round) { confettiCtx.beginPath(); confettiCtx.arc(0, 0, p.size / 2, 0, 6.28); confettiCtx.fill(); }
+        else confettiCtx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        confettiCtx.restore();
+      }
+      if (t < life) confettiFrame = requestAnimationFrame(tick); else stopConfetti();
+    };
+    confettiFrame = requestAnimationFrame(tick);
+  }
+
+  function wobblePointer() {
+    const pointer = document.querySelector('.pointer');
+    pointer.classList.remove('tick'); void pointer.offsetWidth; pointer.classList.add('tick');
+  }
+
   function finish(name) {
     history.push(name);
     // Limit session history when repeats are enabled.
@@ -111,10 +157,12 @@
       $('result-label').textContent = 'THE FLOOR IS YOURS,'; $('result').textContent = name;
       $('winner-name').textContent = name;
       $('winner-popup').hidden = false;
+      wobblePointer(); launchConfetti();
       setTimeout(() => {
+        stopConfetti();
         $('winner-popup').hidden = true;
         finish(name);
-      }, 2500);
+      }, 3200);
     };
   });
 
