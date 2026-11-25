@@ -4,7 +4,7 @@
   const canvas = $('wheel');
   const ctx = canvas.getContext('2d');
   const STORAGE_KEY = 'name-picker:v1';
-  const colors = ['#1d3a7a', '#0e5a6b', '#2a1f5c', '#0b6a62', '#243b8f', '#17496e', '#35308a', '#0a4f55'];
+  const colors = ['#a3283d', '#1f7a57', '#2a4390', '#b07410', '#14707a', '#7a2f6e'];
   let names = [], absent = new Set(), history = [], rotation = 0, busy = false;
   let stats = {}; // picks per name; kept in memory, saved only when "Remember my list" is on
   let animation;
@@ -35,8 +35,8 @@
     for (let i = 0; i < total; i++) {
       const start = -Math.PI / 2 + step * i;
       ctx.beginPath(); ctx.moveTo(500, 500); ctx.arc(500, 500, 500, start, start + step); ctx.closePath();
-      ctx.fillStyle = entries.length ? colors[i % colors.length] : '#16224a'; ctx.fill();
-      ctx.strokeStyle = '#080f24'; ctx.lineWidth = 4; ctx.stroke();
+      ctx.fillStyle = entries.length ? colors[i % colors.length] : '#26397f'; ctx.fill();
+      ctx.strokeStyle = '#14224f'; ctx.lineWidth = 4; ctx.stroke();
       if (entries.length) {
         ctx.save(); ctx.translate(500, 500); ctx.rotate(start + step / 2);
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffffff';
@@ -114,7 +114,7 @@
   // Silent celebration: a short confetti burst on a full-screen canvas.
   const confettiCanvas = $('confetti');
   const confettiCtx = confettiCanvas.getContext('2d');
-  const confettiColors = ['#00d9a6', '#00f0b8', '#ffffff', '#4f7cff', '#35308a', '#ffd166', '#17496e'];
+  const confettiColors = ['#ffc857', '#ffd67e', '#ffffff', '#e0475c', '#2fa377', '#6f8cff', '#b07410'];
   let confettiFrame;
 
   function stopConfetti() {
