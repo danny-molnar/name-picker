@@ -8,6 +8,12 @@ Names stay in the browser. **Remember my list** optionally saves names, attendan
 
 The picker supports up to 100 unique names. Exact duplicates count once; add initials for people with the same name. Selection uses `crypto.getRandomValues` with rejection sampling; the animation follows the result. Reduced-motion preferences are respected.
 
+## Stats and joke mode
+
+**Is it random enough?** (in the sidebar) shows picks per person against the fair share. Stats live in memory and reset on reload, unless **Remember my list** is on; then the per-name counts are saved with the list. **Reset stats** clears them.
+
+**Rig the wheel** is a joke switch, off by default. When on, the first pick of each round always goes to the chosen person (if they are present and in the pool); later picks are random again. Rigged picks are labelled on screen and count in the stats. While it is on, the selection is of course no longer random.
+
 ## GitHub Pages
 
 1. Create a repository named `name-picker` under `danny-molnar`.

@@ -4,8 +4,9 @@
   const canvas = $('wheel');
   const ctx = canvas.getContext('2d');
   const STORAGE_KEY = 'name-picker:v1';
-  const colors = ['#1d3a7a', '#0e5a6b', '#2a1f5c', '#0b6a62', '#243b8f', '#17496e', '#35308a', '#0a4f55'];
+  const colors = ['#a3283d', '#1f7a57', '#2a4390', '#b07410', '#14707a', '#7a2f6e'];
   let names = [], absent = new Set(), history = [], rotation = 0, busy = false;
+  let stats = {}; // picks per name; kept in memory, saved only when "Remember my list" is on
   let animation;
   const available = () => names.filter(name => !absent.has(name) && (!$('no-repeat').checked || !history.includes(name)));
 
@@ -18,7 +19,7 @@
   function persist() {
     try {
       if ($('remember').checked) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ names, absent: [...absent], noRepeat: $('no-repeat').checked }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ names, absent: [...absent], noRepeat: $('no-repeat').checked, stats }));
       } else localStorage.removeItem(STORAGE_KEY);
       $('storage-note').textContent = '';
     } catch {
@@ -34,8 +35,8 @@
     for (let i = 0; i < total; i++) {
       const start = -Math.PI / 2 + step * i;
       ctx.beginPath(); ctx.moveTo(500, 500); ctx.arc(500, 500, 500, start, start + step); ctx.closePath();
-      ctx.fillStyle = entries.length ? colors[i % colors.length] : '#16224a'; ctx.fill();
-      ctx.strokeStyle = '#080f24'; ctx.lineWidth = 4; ctx.stroke();
+      ctx.fillStyle = entries.length ? colors[i % colors.length] : '#26397f'; ctx.fill();
+      ctx.strokeStyle = '#14224f'; ctx.lineWidth = 4; ctx.stroke();
       if (entries.length) {
         ctx.save(); ctx.translate(500, 500); ctx.rotate(start + step / 2);
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffffff';
@@ -71,8 +72,34 @@
       li.append(number, document.createTextNode(name)); return li;
     }));
     $('empty-history').hidden = !!history.length;
-    ['names', 'no-repeat', 'example', 'clear', 'reset'].forEach(id => { $(id).disabled = busy; });
+    renderRig(); renderStats();
+    ['names', 'no-repeat', 'example', 'clear', 'reset', 'rig', 'rig-who'].forEach(id => { $(id).disabled = busy; });
     draw();
+  }
+
+  function renderRig() {
+    const select = $('rig-who'), previous = select.value;
+    select.replaceChildren(...names.map(name => new Option(name, name)));
+    if (names.includes(previous)) select.value = previous;
+    $('rig-row').hidden = !$('rig').checked;
+  }
+
+  function renderStats() {
+    const total = names.reduce((sum, name) => sum + (stats[name] || 0), 0);
+    $('stats-summary').textContent = total ? `${total} ${total === 1 ? 'pick' : 'picks'} so far` : 'No picks yet.';
+    const fair = names.length ? 100 / names.length : 0;
+    $('stats').replaceChildren(...names.map(name => {
+      const count = stats[name] || 0, share = total ? count / total * 100 : 0;
+      const row = document.createElement('div'); row.className = 'stat-row';
+      const label = document.createElement('span'); label.className = 'stat-name'; label.textContent = name;
+      const bar = document.createElement('span'); bar.className = 'stat-bar';
+      const fill = document.createElement('span'); fill.className = 'stat-fill'; fill.style.width = `${share}%`;
+      const tick = document.createElement('span'); tick.className = 'stat-tick'; tick.style.left = `${fair}%`;
+      bar.append(fill, tick);
+      const value = document.createElement('span'); value.className = 'stat-value';
+      value.textContent = `${count} · ${Math.round(share)}% (fair ${Math.round(fair)}%)`;
+      row.append(label, bar, value); return row;
+    }));
   }
 
   // Rejection sampling avoids favouring any index when the range does not divide 2^32.
@@ -87,7 +114,7 @@
   // Silent celebration: a short confetti burst on a full-screen canvas.
   const confettiCanvas = $('confetti');
   const confettiCtx = confettiCanvas.getContext('2d');
-  const confettiColors = ['#00d9a6', '#00f0b8', '#ffffff', '#4f7cff', '#35308a', '#ffd166', '#17496e'];
+  const confettiColors = ['#ffc857', '#ffd67e', '#ffffff', '#e0475c', '#2fa377', '#6f8cff', '#b07410'];
   let confettiFrame;
 
   function stopConfetti() {
@@ -132,11 +159,11 @@
 
   function finish(name) {
     history.push(name);
+    stats[name] = (stats[name] || 0) + 1;
+    persist();
     // Limit session history when repeats are enabled.
     if (history.length > 200) history.shift();
     busy = false;
-    $('result-label').textContent = 'THE FLOOR IS YOURS,';
-    $('result').textContent = name;
     // Prepare the next pool after the winner popup closes.
     render();
     rotation = 0; canvas.style.transform = 'rotate(0deg)';
@@ -144,7 +171,10 @@
 
   $('pick').addEventListener('click', () => {
     const entries = available(); if (busy || !entries.length) return;
-    const index = randomIndex(entries.length);
+    // Joke mode: the first pick of a round goes to the chosen person (if they are in the pool).
+    const rigIndex = $('rig').checked && !history.length ? entries.indexOf($('rig-who').value) : -1;
+    const rigged = rigIndex !== -1;
+    const index = rigged ? rigIndex : randomIndex(entries.length);
     const name = entries[index];
     busy = true; render();
     $('result-label').textContent = 'A LITTLE SUSPENSE…'; $('result').textContent = 'Round and round';
@@ -154,8 +184,9 @@
     animation.onfinish = () => {
       canvas.style.transform = `rotate(${target}deg)`;
       animation.cancel();
-      $('result-label').textContent = 'THE FLOOR IS YOURS,'; $('result').textContent = name;
+      $('result-label').textContent = rigged ? 'THE FLOOR IS YOURS, (RIGGED 😈)' : 'THE FLOOR IS YOURS,'; $('result').textContent = name;
       $('winner-name').textContent = name;
+      $('winner-caption').textContent = rigged ? 'Totally random. Honest. 😈' : 'Your turn to shine.';
       $('winner-popup').hidden = false;
       wobblePointer(); launchConfetti();
       setTimeout(() => {
@@ -171,6 +202,7 @@
     names = parsed.names;
     absent = new Set([...absent].filter(name => names.includes(name)));
     history = history.filter(name => names.includes(name));
+    stats = Object.fromEntries(Object.entries(stats).filter(([name]) => names.includes(name)));
     $('input-note').textContent = [parsed.duplicates ? 'Duplicate names count once. Use an initial for people with the same name.' : '', parsed.overflow ? 'The first 100 unique names are included.' : ''].filter(Boolean).join(' ');
     $('result-label').textContent = 'READY WHEN YOU ARE';
     $('result').textContent = names.length ? 'Give it a spin' : 'Add your people';
@@ -178,9 +210,11 @@
   }
   $('names').addEventListener('input', updateNames);
   $('no-repeat').addEventListener('change', () => { persist(); render(); });
+  $('rig').addEventListener('change', render);
+  $('reset-stats').addEventListener('click', () => { stats = {}; persist(); render(); });
   $('remember').addEventListener('change', persist);
-  $('example').addEventListener('click', () => { $('names').value = 'Alex\nJamie\nMorgan\nSam\nTaylor\nRobin'; absent.clear(); history = []; updateNames(); });
-  $('clear').addEventListener('click', () => { $('names').value = ''; absent.clear(); history = []; updateNames(); });
+  $('example').addEventListener('click', () => { $('names').value = 'Alex\nJamie\nMorgan\nSam\nTaylor\nRobin'; absent.clear(); history = []; stats = {}; updateNames(); });
+  $('clear').addEventListener('click', () => { $('names').value = ''; absent.clear(); history = []; stats = {}; updateNames(); });
   $('reset').addEventListener('click', () => { history = []; $('result-label').textContent = 'A BRAND NEW ROUND'; $('result').textContent = names.length ? 'Who’s next?' : 'Add your people'; render(); });
 
   try {
@@ -188,6 +222,8 @@
     if (saved && Array.isArray(saved.names)) {
       names = parse(saved.names.filter(name => typeof name === 'string').join('\n')).names;
       absent = new Set(Array.isArray(saved.absent) ? saved.absent.filter(name => names.includes(name)) : []);
+      const savedStats = saved.stats && typeof saved.stats === 'object' ? saved.stats : {};
+      stats = Object.fromEntries(names.filter(name => Number.isInteger(savedStats[name]) && savedStats[name] > 0).map(name => [name, savedStats[name]]));
       $('names').value = names.join('\n'); $('remember').checked = true; $('no-repeat').checked = saved.noRepeat !== false;
       $('result-label').textContent = 'WELCOME BACK'; $('result').textContent = names.length ? 'Give it a spin' : 'Add your people';
     }

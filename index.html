@@ -32,10 +32,19 @@
           <div class="settings">
             <label class="setting"><span><strong>Everyone gets a turn</strong><small>Skip names already picked this round</small></span><input id="no-repeat" type="checkbox" checked><span class="toggle" aria-hidden="true"></span></label>
             <label class="setting"><span><strong>Remember my list</strong><small>Save names and attendance on this device</small></span><input id="remember" type="checkbox"><span class="toggle" aria-hidden="true"></span></label>
+            <label class="setting"><span><strong>Rig the wheel 😈</strong><small>Joke mode: the first pick of each round is always…</small></span><input id="rig" type="checkbox"><span class="toggle" aria-hidden="true"></span></label>
+            <div id="rig-row" class="rig-row" hidden><label class="sr-only" for="rig-who">Who gets picked first</label><select id="rig-who"></select></div>
             <p id="storage-note" class="input-note" role="status"></p>
           </div>
           <div class="round-heading"><h3>This round</h3><button class="text-button" id="reset">Start fresh ↺</button></div>
           <ol id="history" class="history" aria-label="Names picked this round"></ol><p id="empty-history" class="empty-history">A clean slate. Let the wheel decide.</p>
+          <details class="stats" id="stats-box">
+            <summary>Is it random enough? 📊</summary>
+            <p id="stats-summary" class="stats-summary">No picks yet.</p>
+            <div id="stats" class="stats-list" aria-label="Picks per person"></div>
+            <p class="stats-hint">Bar = share of all picks. The tick marks the fair share if everyone were picked equally.</p>
+            <button class="text-button muted" id="reset-stats">Reset stats</button>
+          </details>
         </aside>
       </div>
     </main>
@@ -46,7 +55,7 @@
         <span class="winner-spark" aria-hidden="true">✳</span>
         <p>The floor is yours,</p>
         <div id="winner-name" class="winner-name"></div>
-        <span class="winner-caption">Your turn to shine.</span>
+        <span id="winner-caption" class="winner-caption">Your turn to shine.</span>
       </div>
     </div>
     <footer><span>A fair turn, a little fun.</span><span>No accounts. No tracking. Names stay here.</span></footer>
