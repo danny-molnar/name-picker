@@ -83,6 +83,24 @@ button:disabled,textarea:disabled,.setting:has(input:disabled),.person:has(input
 @media(max-width:650px){header{height:80px}.brand{font-size:18px}.local-badge{font-size:10px;padding:6px 8px}.intro{margin:32px 0}.workspace{grid-template-columns:1fr;gap:30px;max-width:400px}.wheel-wrap{width:340px;max-width:100%}.picker{padding-top:0}.panel{padding:24px}.intro h1{font-size:56px}footer{flex-direction:column;align-items:center;gap:8px}.result h2{font-size:32px}.result{min-height:78px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rig-row{margin-top:10px}
+.rig-row[hidden]{display:none}
+select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:9px 10px;font:inherit;font-size:12px}
+select:focus-visible{outline:3px solid #00d9a699;outline-offset:3px}
+.stats{border-top:1px solid var(--line);margin-top:18px;padding-top:14px}
+.stats summary{font-size:12px;font-weight:600;cursor:pointer}
+.stats summary:focus-visible{outline:3px solid #00d9a699;outline-offset:3px}
+.stats-summary{font-size:11px;color:var(--muted);margin:10px 0}
+.stats-list{display:grid;gap:9px;max-height:240px;overflow:auto}
+.stat-row{display:grid;grid-template-columns:1fr;gap:4px;font-size:11px}
+.stat-name{overflow-wrap:anywhere}
+.stat-bar{position:relative;display:block;height:8px;border-radius:5px;background:var(--surface-2)}
+.stat-fill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--accent)}
+.stat-tick{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--warn);border-radius:1px}
+.stat-value{color:var(--muted);font-size:10px}
+.stats-hint{font-size:10px;color:var(--muted);margin:12px 0 6px}
+
 .winner-popup[hidden]{display:none}
 .winner-popup{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:24px;background:#050a1ae6;backdrop-filter:blur(5px);pointer-events:none}
 .winner-card{position:relative;width:min(100%,560px);padding:44px 32px 48px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:26px;box-shadow:0 24px 100px #00d9a622;animation:winner-arrive .55s cubic-bezier(.34,1.56,.64,1)}
